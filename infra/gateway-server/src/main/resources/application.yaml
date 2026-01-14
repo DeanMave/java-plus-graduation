@@ -24,6 +24,9 @@ eureka:
     leaseRenewalIntervalInSeconds: 10
 
 management:
+  endpoint:
+    gateway:
+      enabled: true
   endpoints:
     web:
       exposure:
