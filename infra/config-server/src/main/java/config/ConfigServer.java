@@ -1,4 +1,4 @@
-package ru.practicum.infra.configserver;
+package config;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

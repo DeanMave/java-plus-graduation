@@ -3,7 +3,10 @@ server:
 spring:
   cloud:
     gateway:
-      discovery.locator.enabled: true
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
         - id: categories_all
           uri: lb://main-service

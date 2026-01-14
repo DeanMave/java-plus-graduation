@@ -46,8 +46,8 @@ public class EventPublicServiceImpl extends AbstractEventService implements Even
     public List<EventShortDto> getEvents(SearchOfEventByPublicDto searchDto, Pageable pageable, HttpServletRequest request) {
         log.debug("Публичный поиск событий по критериям: {}", searchDto);
         if (searchDto.getRangeStart() != null
-                && searchDto.getRangeEnd() != null
-                && searchDto.getRangeEnd().isBefore(searchDto.getRangeStart())) {
+            && searchDto.getRangeEnd() != null
+            && searchDto.getRangeEnd().isBefore(searchDto.getRangeStart())) {
             throw new ValidationException("Дата окончания события должна быть после даты начала");
         }
         Predicate predicate = buildPredicate(searchDto);
@@ -159,3 +159,4 @@ public class EventPublicServiceImpl extends AbstractEventService implements Even
         }
     }
 }
+
