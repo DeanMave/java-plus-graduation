@@ -14,10 +14,10 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     Integer countConfirmedRequestsByEventId(@Param("eventId") Long eventId);
 
     @Query("SELECT NEW ru.practicum.main.dto.response.request.ConfirmedRequestsCountDto(" +
-            "r.event.id, COUNT(r)) " +
-            "FROM Request r " +
-            "WHERE r.event.id IN :eventIds AND r.status = 'CONFIRMED' " +
-            "GROUP BY r.event.id")
+           "r.event.id, COUNT(r)) " +
+           "FROM Request r " +
+           "WHERE r.event.id IN :eventIds AND r.status = 'CONFIRMED' " +
+           "GROUP BY r.event.id")
     List<ConfirmedRequestsCountDto> countConfirmedRequestsByEventIds(@Param("eventIds") List<Long> eventIds);
 
     List<Request> findAllByEventId(Long eventId);
@@ -28,16 +28,15 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     @Query("""
             SELECT r FROM Request r
             JOIN FETCH r.event
-            WHERE r.requester.id = :requesterId
+            WHERE r.requesterId = :requesterId
             """)
     List<Request> findAllByRequesterId(@Param("requesterId") Long requesterId);
 
     @Query("""
             SELECT COUNT(r) > 0 FROM Request r
-            WHERE r.event.id = :eventId AND r.requester.id = :requesterId
+            WHERE r.event.id = :eventId AND r.requesterId = :requesterId
             """)
     boolean existsByRequesterIdAndEventId(@Param("requesterId") Long requesterId, @Param("eventId") Long eventId);
 
     int countByEvent_Id(Long eventId);
-
 }
