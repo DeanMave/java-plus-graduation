@@ -37,7 +37,7 @@ spring:
             - CircuitBreaker=mainCircuit
 
         - id: requests_all
-          uri: lb://main-service
+          uri: lb://request-service
           predicates:
             - Path=/users/*/requests/**
           filters:
@@ -53,11 +53,11 @@ spring:
 resilience4j.circuitbreaker:
   configs:
     default:
-      slidingWindowSize: 10
+      slidingWindowSize: 50
       failureRateThreshold: 50
-      waitDurationInOpenState: 10s
+      waitDurationInOpenState: 30s
       permittedNumberOfCallsInHalfOpenState: 3
-      minimumNumberOfCalls: 5
+      minimumNumberOfCalls: 10
       automaticTransitionFromOpenToHalfOpenEnabled: true
       slidingWindowType: COUNT_BASED
 

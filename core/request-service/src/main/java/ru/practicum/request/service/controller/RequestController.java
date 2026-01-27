@@ -1,10 +1,10 @@
-package ru.practicum.main.controller;
+package ru.practicum.request.service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.main.dto.response.request.ParticipationRequestDto;
-import ru.practicum.main.service.interfaces.RequestService;
+import ru.practicum.request.service.dto.response.request.ParticipationRequestDto;
+import ru.practicum.request.service.service.interfaces.RequestService;
 
 import java.util.List;
 

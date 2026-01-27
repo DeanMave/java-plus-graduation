@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.main.model.Request;
+import ru.practicum.main.dto.response.request.RequestDto;
 
 import java.util.Set;
 
@@ -15,10 +15,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventRequestStatusUpdateRequest {
-
     @NotEmpty(message = "Список идентификаторов запросов не может быть пустым")
     private Set<Long> requestIds;
 
     @NotNull(message = "Статус не может быть null")
-    private Request.RequestStatus status;
+    private RequestDto.RequestStatusDto status;
 }

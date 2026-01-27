@@ -1,6 +1,6 @@
-package ru.practicum.main.service.interfaces;
+package ru.practicum.request.service.service.interfaces;
 
-import ru.practicum.main.dto.response.request.ParticipationRequestDto;
+import ru.practicum.request.service.dto.response.request.ParticipationRequestDto;
 
 import java.util.List;
 
@@ -10,6 +10,4 @@ public interface RequestService {
     List<ParticipationRequestDto> getRequestsByRequesterId(Long userId);
 
     ParticipationRequestDto cancel(Long userId, Long requestId);
-
-
 }

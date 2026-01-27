@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPredicateExecutor<Event> {
-
     Page<Event> findByInitiatorIdOrderByCreatedOnDesc(Long initiatorId, Pageable pageable);
 
     Optional<Event> findByIdAndInitiatorId(Long id, Long initiatorId);

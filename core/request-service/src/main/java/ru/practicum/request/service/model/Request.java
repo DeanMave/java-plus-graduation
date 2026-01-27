@@ -1,4 +1,4 @@
-package ru.practicum.main.model;
+package ru.practicum.request.service.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,9 +22,8 @@ public class Request {
     @Column(name = "created", updatable = false)
     private LocalDateTime created;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id", nullable = false)
-    private Event event;
+    @Column(name = "event_id", nullable = false)
+    private Long eventId;
 
     @Column(name = "requester_id", nullable = false)
     private Long requesterId;
@@ -37,3 +36,4 @@ public class Request {
         PENDING, CONFIRMED, REJECTED, CANCELED
     }
 }
+
