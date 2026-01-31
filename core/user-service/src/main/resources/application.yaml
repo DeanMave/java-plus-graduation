@@ -1,8 +1,6 @@
 spring:
   application:
     name: user-service
-  profiles:
-    active: docker
   config:
     import: "configserver:"
   cloud:
