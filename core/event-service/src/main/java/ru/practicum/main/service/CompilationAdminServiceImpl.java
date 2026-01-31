@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.client.user.UserClient;
+import ru.practicum.main.dto.mappers.CompilationMapper;
 import ru.practicum.main.dto.request.compilation.NewCompilationDto;
 import ru.practicum.main.dto.request.compilation.UpdateCompilationRequest;
 import ru.practicum.main.dto.response.compilation.CompilationDto;
@@ -21,9 +22,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static ru.practicum.main.dto.mappers.CompilationMapper.toDto;
-import static ru.practicum.main.dto.mappers.CompilationMapper.toEntity;
-
 
 @Service
 @Slf4j
@@ -32,6 +30,7 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final UserClient userClient;
+    private final CompilationMapper compilationMapper;
 
     @Override
     @Transactional
@@ -41,9 +40,9 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
 
         Map<Long, UserDto> usersMap = getUsersForEvents(events);
 
-        Compilation compilation = toEntity(newCompilation, events);
+        Compilation compilation = compilationMapper.toEntity(newCompilation, events);
         Compilation savedCompilation = compilationRepository.save(compilation);
-        return toDto(savedCompilation, usersMap);
+        return compilationMapper.toDto(savedCompilation, usersMap);
     }
 
     @Override
@@ -67,7 +66,7 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
 
         log.info("обновленная подборка{}", updatedCompilation);
 
-        return toDto(updated, usersMap);
+        return compilationMapper.toDto(updated, usersMap);
     }
 
     private Compilation getById(Long compilationId) {

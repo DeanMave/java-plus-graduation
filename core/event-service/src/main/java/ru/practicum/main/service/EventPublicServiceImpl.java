@@ -36,13 +36,15 @@ import java.util.stream.Collectors;
 public class EventPublicServiceImpl extends AbstractEventService implements EventPublicService {
 
     private final EventRepository eventRepository;
+    private final EventMapper eventMapper;
 
     public EventPublicServiceImpl(RequestClient requestClient,
                                   StatClient statClient,
                                   EventRepository eventRepository,
-                                  UserClient userClient) {
+                                  UserClient userClient, EventMapper eventMapper) {
         super(requestClient, statClient, userClient);
         this.eventRepository = eventRepository;
+        this.eventMapper = eventMapper;
     }
 
     @Override
@@ -77,7 +79,7 @@ public class EventPublicServiceImpl extends AbstractEventService implements Even
                         throw new NotFoundException("Пользователь c userId " + event.getInitiatorId() + " не найден");
                     }
 
-                    EventShortDto dto = EventMapper.toEventShortDto(event, userDto);
+                    EventShortDto dto = eventMapper.toEventShortDto(event, userDto);
                     dto.setViews(views.getOrDefault(event.getId(), 0L));
                     dto.setConfirmedRequests(confirmedRequests.getOrDefault(event.getId(), 0));
                     return dto;
@@ -99,7 +101,7 @@ public class EventPublicServiceImpl extends AbstractEventService implements Even
         Long views = getEventViews(id);
         Integer confirmedRequests = getConfirmedRequestsCount(id);
         event.setConfirmedRequests(confirmedRequests);
-        EventFullDto result = EventMapper.toEventFullDto(event, userDto);
+        EventFullDto result = eventMapper.toEventFullDto(event, userDto);
         result.setViews(views);
         result.setConfirmedRequests(confirmedRequests);
 

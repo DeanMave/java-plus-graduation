@@ -28,6 +28,21 @@ spring:
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://ewm-db:5432/ewm
+    username: postgres
+    password: root
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+
+  sql:
+    init:
+      mode: always
+
 
 logging:
   level:

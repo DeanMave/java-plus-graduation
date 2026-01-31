@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.request.dto.response.event.EventDto;
 
-@FeignClient(name = "main-service", fallback = EventServiceClientFallback.class)
+@FeignClient(name = "event-service", fallback = EventServiceClientFallback.class)
 public interface EventClient {
     @GetMapping("/internal/events/{eventId}")
     EventDto getEventById(@PathVariable("eventId") Long eventId);

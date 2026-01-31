@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.main.client.user.UserClient;
+import ru.practicum.main.dto.mappers.CompilationMapper;
 import ru.practicum.main.dto.response.compilation.CompilationDto;
 import ru.practicum.main.dto.response.user.UserDto;
 import ru.practicum.main.exception.NotFoundException;
@@ -18,7 +19,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static ru.practicum.main.dto.mappers.CompilationMapper.toDto;
 
 @Service
 @Slf4j
@@ -26,6 +26,7 @@ import static ru.practicum.main.dto.mappers.CompilationMapper.toDto;
 public class CompilationPublicServiceImpl implements CompilationPublicService {
     private final CompilationRepository compilationRepository;
     private final UserClient userClient;
+    private final CompilationMapper compilationMapper;
 
     @Override
     public List<CompilationDto> findAllByFilters(Boolean pinned, Pageable pageable) {
@@ -45,7 +46,7 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
         Map<Long, UserDto> usersMap = getUsersForAllCompilations(compilationList);
 
         return compilationList.stream()
-                .map(compilation -> toDto(compilation, usersMap))
+                .map(compilation -> compilationMapper.toDto(compilation, usersMap))
                 .collect(Collectors.toList());
     }
 
@@ -56,7 +57,7 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
         Compilation compilation = getById(compilationId);
         Map<Long, UserDto> usersMap = getUsersForEvents(compilation.getEvents());
 
-        return toDto(compilation, usersMap);
+        return compilationMapper.toDto(compilation, usersMap);
     }
 
     private Compilation getById(Long compilationId) {

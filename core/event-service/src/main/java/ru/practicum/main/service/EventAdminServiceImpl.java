@@ -41,17 +41,21 @@ public class EventAdminServiceImpl extends AbstractEventService implements Event
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
+    private final EventMapper eventMapper;
+    private final LocationMapper locationMapper;
 
     public EventAdminServiceImpl(RequestClient requestClient,
                                  StatClient statClient,
                                  UserClient userClient,
                                  EventRepository eventRepository,
                                  CategoryRepository categoryRepository,
-                                 LocationRepository locationRepository) {
+                                 LocationRepository locationRepository, EventMapper eventMapper, LocationMapper locationMapper) {
         super(requestClient, statClient, userClient);
         this.eventRepository = eventRepository;
         this.categoryRepository = categoryRepository;
         this.locationRepository = locationRepository;
+        this.eventMapper = eventMapper;
+        this.locationMapper = locationMapper;
     }
 
     @Override
@@ -77,7 +81,7 @@ public class EventAdminServiceImpl extends AbstractEventService implements Event
                         throw new NotFoundException("Пользователь c userId " + event.getInitiatorId() + " не найден");
                     }
 
-                    EventFullDto dto = EventMapper.toEventFullDto(event, userDto);
+                    EventFullDto dto = eventMapper.toEventFullDto(event, userDto);
                     dto.setViews(views.getOrDefault(event.getId(), 0L));
                     dto.setConfirmedRequests(confirmedRequests.getOrDefault(event.getId(), 0));
                     return dto;
@@ -108,7 +112,7 @@ public class EventAdminServiceImpl extends AbstractEventService implements Event
         Integer confirmedRequests = getConfirmedRequestsCount(eventId);
         updatedEvent.setConfirmedRequests(confirmedRequests);
 
-        EventFullDto result = EventMapper.toEventFullDto(updatedEvent, userDto);
+        EventFullDto result = eventMapper.toEventFullDto(updatedEvent, userDto);
         result.setViews(views);
         result.setConfirmedRequests(confirmedRequests);
 
@@ -163,7 +167,7 @@ public class EventAdminServiceImpl extends AbstractEventService implements Event
             event.setDescription(updateRequest.getDescription());
         }
         if (updateRequest.getLocation() != null) {
-            LocationEntity locationEntity = LocationMapper.toLocation(updateRequest.getLocation());
+            LocationEntity locationEntity = locationMapper.toLocation(updateRequest.getLocation());
             LocationEntity savedLocation = locationRepository.save(locationEntity);
             event.setLocationEntity(savedLocation);
         }

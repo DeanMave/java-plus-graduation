@@ -42,17 +42,23 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
+    private final EventMapper eventMapper;
+    private final LocationMapper locationMapper;
+    private final RequestMapper requestMapper;
 
     public EventPrivateServiceImpl(RequestClient requestClient,
                                    StatClient statClient,
                                    EventRepository eventRepository,
                                    UserClient userClient,
                                    CategoryRepository categoryRepository,
-                                   LocationRepository locationRepository) {
+                                   LocationRepository locationRepository, EventMapper eventMapper, LocationMapper locationMapper, RequestMapper requestMapper) {
         super(requestClient, statClient, userClient);
         this.eventRepository = eventRepository;
         this.categoryRepository = categoryRepository;
         this.locationRepository = locationRepository;
+        this.eventMapper = eventMapper;
+        this.locationMapper = locationMapper;
+        this.requestMapper = requestMapper;
     }
 
     @Override
@@ -68,7 +74,7 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
         Map<Long, Long> views = getEventsViews(events);
         return events.stream()
                 .map(event -> {
-                    EventShortDto dto = EventMapper.toEventShortDto(event, userDto);
+                    EventShortDto dto = eventMapper.toEventShortDto(event, userDto);
                     dto.setViews(views.getOrDefault(event.getId(), 0L));
                     return dto;
                 })
@@ -83,13 +89,13 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
                 .orElseThrow(() -> new NotFoundException(
                         "Категория c id " + newEventDto.getCategory() + " не найдена"));
         validateEventDate(newEventDto.getEventDate());
-        LocationEntity locationEntity = LocationMapper.toLocation(newEventDto.getLocation());
+        LocationEntity locationEntity = locationMapper.toLocation(newEventDto.getLocation());
         LocationEntity savedLocationEntity = locationRepository.save(locationEntity);
-        Event event = EventMapper.toEventFromNewEventDto(newEventDto, userId, category, savedLocationEntity);
+        Event event = eventMapper.toEventFromNewEventDto(newEventDto, userId, category, savedLocationEntity);
         event.setConfirmedRequests(0);
         Event savedEvent = eventRepository.save(event);
         log.info("Событие создано успешно: ID {}", savedEvent.getId());
-        EventFullDto result = EventMapper.toEventFullDto(savedEvent, userDto);
+        EventFullDto result = eventMapper.toEventFullDto(savedEvent, userDto);
         result.setViews(0L);
         return result;
     }
@@ -101,7 +107,7 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
         Integer confirmedRequests = getConfirmedRequestsCount(eventId);
         event.setConfirmedRequests(confirmedRequests);
         Long views = getEventViews(eventId);
-        EventFullDto result = EventMapper.toEventFullDto(event, userDto);
+        EventFullDto result = eventMapper.toEventFullDto(event, userDto);
         result.setViews(views);
         log.debug("Событие {} пользователя {} найдено", eventId, userId);
         return result;
@@ -130,7 +136,7 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
         event.setConfirmedRequests(confirmedRequests);
         Event updatedEvent = eventRepository.save(event);
         Long views = getEventViews(eventId);
-        EventFullDto result = EventMapper.toEventFullDto(updatedEvent, userDto);
+        EventFullDto result = eventMapper.toEventFullDto(updatedEvent, userDto);
         result.setViews(views);
         log.info("Событие {} пользователя {} успешно обновлено", eventId, userId);
         return result;
@@ -150,7 +156,7 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
             event.setDescription(updateRequest.getDescription());
         }
         if (updateRequest.getLocation() != null) {
-            LocationEntity locationEntity = LocationMapper.toLocation(updateRequest.getLocation());
+            LocationEntity locationEntity = locationMapper.toLocation(updateRequest.getLocation());
             LocationEntity savedLocation = locationRepository.save(locationEntity);
             event.setLocationEntity(savedLocation);
         }
@@ -198,7 +204,7 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
             return Collections.emptyList();
         }
         return requests.stream()
-                .map(RequestMapper::toParticipationRequestDto)
+                .map(requestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList());
     }
 
@@ -369,11 +375,11 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
                 .collect(Collectors.toList());
 
         result.setConfirmedRequests(updatedConfirmed.stream()
-                .map(RequestMapper::toParticipationRequestDto)
+                .map(requestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList()));
 
         result.setRejectedRequests(updatedRejected.stream()
-                .map(RequestMapper::toParticipationRequestDto)
+                .map(requestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList()));
 
         log.debug("После подтверждения: CONFIRMED={}, REJECTED={}",
@@ -393,7 +399,7 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
         List<RequestDto> updatedRequests = getUpdatedRequests(requestIds, event.getId());
 
         result.setRejectedRequests(updatedRequests.stream()
-                .map(RequestMapper::toParticipationRequestDto)
+                .map(requestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList()));
 
         result.setConfirmedRequests(Collections.emptyList());

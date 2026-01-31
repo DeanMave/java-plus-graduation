@@ -1,7 +1,8 @@
 package ru.practicum.main.dto.mappers;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.practicum.main.dto.request.compilation.NewCompilationDto;
 import ru.practicum.main.dto.response.compilation.CompilationDto;
 import ru.practicum.main.dto.response.event.EventShortDto;
@@ -16,41 +17,41 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CompilationMapper {
+@Mapper(componentModel = "spring", uses = {EventMapper.class})
+public abstract class CompilationMapper {
 
-    public static Compilation toEntity(NewCompilationDto newCompilation, Set<Event> events) {
-        return Compilation
-                .builder()
-                .title(newCompilation.getTitle())
-                .events(events)
-                .pinned(newCompilation.getPinned())
-                .build();
-    }
+    @Autowired
+    protected EventMapper eventMapper;
 
-    public static CompilationDto toDto(Compilation compilation, Map<Long, UserDto> usersMap) {
+    @Mapping(target = "events", source = "events")
+    @Mapping(target = "id", ignore = true)
+    public abstract Compilation toEntity(NewCompilationDto newCompilation, Set<Event> events);
+
+    public CompilationDto toDto(Compilation compilation, Map<Long, UserDto> usersMap) {
+        if (compilation == null) return null;
+
         Set<EventShortDto> eventDtos = compilation.getEvents().stream()
                 .map(event -> {
                     UserDto userDto = usersMap.get(event.getInitiatorId());
                     if (userDto == null) {
-                        throw new NotFoundException("Пользователь не найден");
+                        throw new NotFoundException("Пользователь не найден для события " + event.getId());
                     }
-                    return EventMapper.toEventShortDto(event, userDto);
+                    return eventMapper.toEventShortDto(event, userDto);
                 })
                 .collect(Collectors.toSet());
 
-        return CompilationDto
-                .builder()
-                .events(eventDtos)
+        return CompilationDto.builder()
                 .id(compilation.getId())
                 .pinned(compilation.getPinned())
                 .title(compilation.getTitle())
+                .events(eventDtos)
                 .build();
     }
 
-    public static List<CompilationDto> toDto(List<Compilation> compilations, Map<Long, UserDto> usersMap) {
+    public List<CompilationDto> toDtoList(List<Compilation> compilations, Map<Long, UserDto> usersMap) {
+        if (compilations == null) return null;
         return compilations.stream()
-                .map(compilation -> toDto(compilation, usersMap))
+                .map(c -> toDto(c, usersMap))
                 .collect(Collectors.toList());
     }
 }

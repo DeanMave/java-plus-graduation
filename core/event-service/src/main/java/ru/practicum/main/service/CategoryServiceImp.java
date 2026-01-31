@@ -16,29 +16,27 @@ import ru.practicum.main.service.interfaces.CategoryService;
 
 import java.util.List;
 
-import static ru.practicum.main.dto.mappers.CategoryMapper.toEntity;
-import static ru.practicum.main.dto.mappers.CategoryMapper.toDto;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CategoryServiceImp implements CategoryService {
     private final CategoryRepository repository;
+    private final CategoryMapper categoryMapper;
 
     //Получение категорий
     @Override
     public List<CategoryDto> getCategories(Pageable pageable) {
         List<Category> categories = repository.findAll(pageable).stream().toList();
         return categories.stream()
-                .map(CategoryMapper::toDto)
+                .map(categoryMapper::toDto)
                 .toList();
     }
 
     //Получение категории
     @Override
     public CategoryDto getCategory(Long catId) {
-        return toDto(repository.findById(catId).orElseThrow(() -> new NotFoundException("Category with id=" + catId + " was not found")));
+        return categoryMapper.toDto(repository.findById(catId).orElseThrow(() -> new NotFoundException("Category with id=" + catId + " was not found")));
     }
 
     //Добавление
@@ -46,10 +44,10 @@ public class CategoryServiceImp implements CategoryService {
     @Transactional
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
         log.info("Добавление новой категории " + newCategoryDto);
-        Category category = toEntity(newCategoryDto);
+        Category category = categoryMapper.toEntity(newCategoryDto);
         Category savedCategory = repository.save(category);
         log.info("Категория добавлена: {}", savedCategory);
-        return toDto(savedCategory);
+        return categoryMapper.toDto(savedCategory);
     }
 
     //Удаление
@@ -75,6 +73,6 @@ public class CategoryServiceImp implements CategoryService {
         existingCategory.setName(newCategoryDto.getName());
         Category updatedCategory = repository.save(existingCategory);
         log.info("Категория обновлена: {}", updatedCategory);
-        return toDto(updatedCategory);
+        return categoryMapper.toDto(updatedCategory);
     }
 }

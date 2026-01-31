@@ -14,6 +14,27 @@ spring:
         max-attempts: 10
         max-interval: 10000
 
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/core_request_service
+    username: postgres
+    password: root
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+  sql:
+    init:
+      mode: always
+
 feign:
   circuitbreaker:
     enabled: true
@@ -32,7 +53,7 @@ resilience4j:
         sliding-window-type: COUNT_BASED
         minimum-number-of-calls: 7
         automatic-transition-from-open-to-half-open-enabled: true
-      main-service:
+      event-service:
         sliding-window-size: 30
         wait-duration-in-open-state: 10000
         permitted-number-of-calls-in-half-open-state: 3
