@@ -30,7 +30,7 @@ spring:
     date-format: "yyyy-MM-dd HH:mm:ss"
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://ewm-db:5432/ewm
+    url: jdbc:postgresql://localhost:5432/ewm
     username: postgres
     password: root
 
