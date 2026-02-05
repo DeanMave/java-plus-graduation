@@ -24,7 +24,6 @@ import ru.practicum.main.exception.ValidationException;
 import ru.practicum.main.model.*;
 import ru.practicum.main.repository.*;
 import ru.practicum.main.service.interfaces.EventPrivateService;
-import ru.practicum.stats.client.StatClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

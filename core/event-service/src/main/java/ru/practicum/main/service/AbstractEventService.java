@@ -9,7 +9,6 @@ import ru.practicum.main.dto.response.request.ConfirmedRequestsCountDto;
 import ru.practicum.main.dto.response.user.UserDto;
 import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.model.Event;
-import ru.practicum.stats.client.StatClient;
 import ru.practicum.stats.dto.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;

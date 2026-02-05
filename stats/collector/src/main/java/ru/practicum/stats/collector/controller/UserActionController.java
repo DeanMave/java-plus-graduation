@@ -1,0 +1,36 @@
+package ru.practicum.stats.collector.controller;
+
+import com.google.protobuf.Empty;
+import io.grpc.Status;
+import io.grpc.stub.StreamObserver;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.server.service.GrpcService;
+import ru.practicum.stats.collector.service.UserActionHandler;
+import ru.practicum.stats.proto.UserActionControllerGrpc;
+import ru.practicum.stats.proto.UserActionProto;
+
+@Slf4j
+@GrpcService
+@RequiredArgsConstructor
+public class UserActionController extends UserActionControllerGrpc.UserActionControllerImplBase {
+
+    private final UserActionHandler handler;
+
+    @Override
+    public void collectUserAction(UserActionProto request, StreamObserver<Empty> responseObserver) {
+        try {
+            handler.handle(request);
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Ошибка обработки collectUserAction", e);
+            responseObserver.onError(
+                    Status.INTERNAL
+                            .withDescription("Ошибка сервера при обработке события")
+                            .withCause(e)
+                            .asRuntimeException()
+            );
+        }
+    }
+}

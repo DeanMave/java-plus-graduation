@@ -22,7 +22,6 @@ import ru.practicum.main.model.Event;
 import ru.practicum.main.model.QEvent;
 import ru.practicum.main.repository.EventRepository;
 import ru.practicum.main.service.interfaces.EventPublicService;
-import ru.practicum.stats.client.StatClient;
 import ru.practicum.stats.dto.dto.EndpointHitDto;
 
 import java.time.LocalDateTime;
