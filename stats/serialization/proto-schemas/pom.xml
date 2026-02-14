@@ -12,11 +12,10 @@
     <artifactId>proto-schemas</artifactId>
 
     <properties>
-        <maven.compiler.source>23</maven.compiler.source>
-        <maven.compiler.target>23</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.grpc</groupId>
@@ -28,6 +27,8 @@
             <artifactId>grpc-protobuf</artifactId>
         </dependency>
 
+        <!-- Until gRPC generator library moves to generated jakarta instead of javax -->
+        <!-- https://github.com/grpc/grpc-java/issues/9179 -->
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
@@ -89,6 +90,4 @@
             </plugin>
         </plugins>
     </build>
-
-
 </project>

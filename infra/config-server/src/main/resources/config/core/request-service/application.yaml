@@ -61,6 +61,17 @@ resilience4j:
         minimum-number-of-calls: 7
         automatic-transition-from-open-to-half-open-enabled: true
 
+grpc:
+  client:
+    collector:
+      address: discovery:///collector
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+      enableRetry: true
+      retryAttempts: 15
+      retryDelay: 3000
+
 logging:
   level:
     root: INFO

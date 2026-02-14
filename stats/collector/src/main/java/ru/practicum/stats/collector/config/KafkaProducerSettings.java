@@ -25,7 +25,7 @@ public class KafkaProducerSettings {
     private int maxInFlightRequestsPerConnection;
     private long lingerMs;
     private int batchSize;
-    private String compressionType = "zstd"; // безопасный дефолт
+    private String compressionType = "zstd";
 
     public Map<String, Object> asMap() {
         Map<String, Object> props = new HashMap<>();

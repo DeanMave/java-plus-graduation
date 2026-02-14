@@ -1,8 +1,10 @@
 package ru.practicum.request.service;
 
+import com.google.protobuf.Timestamp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.client.CollectorClient;
 import ru.practicum.request.client.event.EventClient;
 import ru.practicum.request.client.user.UserClient;
 import ru.practicum.request.dto.mappers.RequestMapper;
@@ -15,7 +17,10 @@ import ru.practicum.request.exception.OwnershipMismatchException;
 import ru.practicum.request.model.Request;
 import ru.practicum.request.repository.RequestRepository;
 import ru.practicum.request.service.interfaces.RequestService;
+import ru.practicum.stats.proto.ActionTypeProto;
+import ru.practicum.stats.proto.UserActionProto;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,6 +32,7 @@ public class RequestServiceImpl implements RequestService {
     private final EventClient eventClient;
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
+    private final CollectorClient collectorClient;
 
     @Override
     public List<ParticipationRequestDto> getRequestsByRequesterId(Long userId) {
@@ -75,6 +81,7 @@ public class RequestServiceImpl implements RequestService {
         if (event.getParticipantLimit() == 0) {
             request.setStatus(Request.RequestStatus.CONFIRMED);
         }
+        collectorClient.sendUserAction(createUserAction(eventId, userId, ActionTypeProto.ACTION_REGISTER));
         return requestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
@@ -103,5 +110,18 @@ public class RequestServiceImpl implements RequestService {
     private Request getRequestById(Long requestId) {
         return requestRepository.findById(requestId).orElseThrow(() ->
                 new NotFoundException("Запрос с id " + requestId + " не найден"));
+    }
+
+    UserActionProto createUserAction(Long eventId, Long userId, ActionTypeProto typeProto) {
+        Instant timestamp = Instant.now();
+        return UserActionProto.newBuilder()
+                .setUserId(userId)
+                .setEventId(eventId)
+                .setActionType(typeProto)
+                .setTimestamp(Timestamp.newBuilder()
+                        .setSeconds(timestamp.getEpochSecond())
+                        .setNanos(timestamp.getNano())
+                        .build())
+                .build();
     }
 }

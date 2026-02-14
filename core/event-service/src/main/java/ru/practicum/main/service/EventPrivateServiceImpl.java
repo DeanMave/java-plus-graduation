@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.CollectorClient;
+import ru.practicum.client.RecommendationsClient;
 import ru.practicum.main.client.request.RequestClient;
 import ru.practicum.main.client.user.UserClient;
 import ru.practicum.main.dto.mappers.EventMapper;
@@ -46,12 +48,13 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
     private final RequestMapper requestMapper;
 
     public EventPrivateServiceImpl(RequestClient requestClient,
-                                   StatClient statClient,
+                                   CollectorClient collectorClient,
+                                   RecommendationsClient recommendationsClient,
                                    EventRepository eventRepository,
                                    UserClient userClient,
                                    CategoryRepository categoryRepository,
                                    LocationRepository locationRepository, EventMapper eventMapper, LocationMapper locationMapper, RequestMapper requestMapper) {
-        super(requestClient, statClient, userClient);
+        super(requestClient, collectorClient, recommendationsClient, userClient);
         this.eventRepository = eventRepository;
         this.categoryRepository = categoryRepository;
         this.locationRepository = locationRepository;
@@ -70,11 +73,11 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
             return Collections.emptyList();
         }
         List<Event> events = eventsPage.getContent();
-        Map<Long, Long> views = getEventsViews(events);
+        Map<Long, Double> ratings = getEventsRatings(events);
         return events.stream()
                 .map(event -> {
                     EventShortDto dto = eventMapper.toEventShortDto(event, userDto);
-                    dto.setViews(views.getOrDefault(event.getId(), 0L));
+                    dto.setRating(ratings.get(event.getId()));
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -95,7 +98,7 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
         Event savedEvent = eventRepository.save(event);
         log.info("Событие создано успешно: ID {}", savedEvent.getId());
         EventFullDto result = eventMapper.toEventFullDto(savedEvent, userDto);
-        result.setViews(0L);
+        result.setRating(0.0);
         return result;
     }
 
@@ -105,9 +108,8 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
         Event event = validateEventOfInitiator(eventId, userId);
         Integer confirmedRequests = getConfirmedRequestsCount(eventId);
         event.setConfirmedRequests(confirmedRequests);
-        Long views = getEventViews(eventId);
         EventFullDto result = eventMapper.toEventFullDto(event, userDto);
-        result.setViews(views);
+        result.setRating(getEventRating(eventId));
         log.debug("Событие {} пользователя {} найдено", eventId, userId);
         return result;
     }
@@ -134,9 +136,8 @@ public class EventPrivateServiceImpl extends AbstractEventService implements Eve
         Integer confirmedRequests = getConfirmedRequestsCount(eventId);
         event.setConfirmedRequests(confirmedRequests);
         Event updatedEvent = eventRepository.save(event);
-        Long views = getEventViews(eventId);
         EventFullDto result = eventMapper.toEventFullDto(updatedEvent, userDto);
-        result.setViews(views);
+        result.setRating(getEventRating(eventId));
         log.info("Событие {} пользователя {} успешно обновлено", eventId, userId);
         return result;
     }

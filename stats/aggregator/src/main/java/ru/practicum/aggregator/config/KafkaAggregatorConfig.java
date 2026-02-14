@@ -26,12 +26,14 @@ public class KafkaAggregatorConfig {
     private final Consumer consumer = new Consumer();
     private final Producer producer = new Producer();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     public static class Consumer {
         private String topic;
     }
 
-    @Getter @Setter
+    @Getter
+    @Setter
     public static class Producer {
         private String topic;
     }
