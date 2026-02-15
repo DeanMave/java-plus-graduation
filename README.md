@@ -14,7 +14,13 @@
 * **event-service** - управление жизненным циклом событий (создание, модерация, поиск).
 * **request-service** - обработка заявок на участие и контроль лимитов участников.
 * **comment-service** - функционал отзывов и обсуждений под событиями.
-* **stats-service** - сервис сбора и агрегации статистики просмотров.
+
+### Рекомендательная система 
+Вместо классического сервиса статистики внедрена трехуровневая система обработки данных:
+
+* **Collector** - gRPC-сервер, принимающий сырые данные о действиях пользователей и транслирующий их в Kafka (topic: stats.user-actions.v1).
+* **Aggregator** - стриминговый сервис. Читает логи действий, вычисляет коэффициенты сходства мероприятий и передает результаты дальше (topic: stats.events-similarity.v1).
+* **Analyzer** - аналитическое ядро. Аккумулирует данные из Kafka в БД, вычисляет веса предпочтений и предоставляет gRPC API для получения персональных рекомендаций.
 
 ### Инфраструктурные компоненты
 * **Gateway Server** - единая точка входа. Осуществляет маршрутизацию внешних HTTP-запросов к соответствующим сервисам.
@@ -31,7 +37,7 @@
 
 * **Проверка зависимостей:** При создании комментария `comment-service` обращается к `user-service` и `event-service` для подтверждения существования авторов и событий.
 * **Синхронизация участников:** `event-service` запрашивает у `request-service` актуальное количество подтвержденных заявок для корректного отображения лимитов.
-* **Логирование активности:** Все сервисы являются поставщиками данных для `stats-service`, передавая информацию о посещении эндпоинтов.
+
 
 ---
 ## Технологический стек
@@ -44,6 +50,9 @@
 - PostgreSQL
 - Docker, Docker Compose 
 - Maven 
+- Apache Kafka
+- Protobuf
+- gRPC
 
 ---
 ## Нефункциональные аспекты
@@ -58,9 +67,10 @@
 
 
 ### Порядок запуска:
-1. Запуск **Discovery Server**.
-2. Запуск **Config Server**.
-3. Запуск прикладных микросервисов и **Gateway Server**.
+1. Infrastructure: Discovery Server, Config Server, Kafka.
+2. Data Layer: Collector, Aggregator, Analyzer.
+3. Business Logic: User, Event, Request, Comment services.
+4. Entry Point: Gateway Server.
 
 >Все параметры подключения, уровни логирования и настройки Resilience4j (Circuit Breaker) подгружаются динамически через Config Server.
 
@@ -69,5 +79,4 @@
 ## Внешние спецификации API
 
 Проект полностью реализует требования API Yandex Practicum. Ознакомиться со спецификациями можно по ссылкам:
-* [Основной сервис (Main Service)](https://raw.githubusercontent.com/yandex-praktikum/java-explore-with-me/main/ewm-main-service-spec.json)
-* [Сервис статистики (Stats Service)](https://raw.githubusercontent.com/yandex-praktikum/java-explore-with-me/main/ewm-stats-service-spec.json)
+* [Postman коллекция](https://raw.githubusercontent.com/yandex-praktikum/java-plus-graduation/refs/heads/ci/.github/workflows/stuff/postman/recommendations/ewm-main-service.json)
