@@ -1,0 +1,28 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    consumer:
+      group-id: stats.aggregator.actions
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: ru.practicum.stats.avro.deserializer.UserActionDeserializer
+      properties:
+        specific.avro.reader: true
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: ru.practicum.stats.avro.serializer.GeneralAvroSerializer
+
+aggregator:
+  kafka:
+    consumer:
+      topic: stats.user-actions.v1
+    producer:
+      topic: stats.events-similarity.v1
+
+similarity:
+  action-weights:
+    VIEW: 0.4
+    REGISTER: 0.8
+    LIKE: 1.0

@@ -30,7 +30,7 @@ spring:
     date-format: "yyyy-MM-dd HH:mm:ss"
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://ewm-db:5432/ewm
+    url: jdbc:postgresql://localhost:5432/ewm
     username: postgres
     password: root
 
@@ -43,6 +43,24 @@ spring:
     init:
       mode: always
 
+grpc:
+  client:
+    analyzer:
+      address: discovery:///analyzer
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+      enableRetry: true
+      retryAttempts: 15
+      retryDelay: 3000
+    collector:
+      address: discovery:///collector
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+      enableRetry: true
+      retryAttempts: 15
+      retryDelay: 3000
 
 logging:
   level:
